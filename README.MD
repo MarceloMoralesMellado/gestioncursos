@@ -129,5 +129,5 @@ DELETE: localhost:8082/api/soporte/{idSoporte}
 
 CORRECCION PROFESOR:
 
--Mismo problema del Benja con el usuario que queda en el aire cuando uno elimina un ticket.
+-Con el usuario que queda en el aire cuando uno elimina un ticket.
 -No eliminar los ticket (DELETE), cambiarlos de estado solamente, así me puede quedar un registro por si se tiene que retomar nuevamente el problema.
