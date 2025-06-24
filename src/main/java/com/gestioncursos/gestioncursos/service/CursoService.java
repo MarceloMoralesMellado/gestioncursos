@@ -10,14 +10,8 @@ import com.gestioncursos.gestioncursos.model.Curso;
 import com.gestioncursos.gestioncursos.repository.CursoRepository;
 
 @Service
-public class CursoService {
-    
-    /*
-        Curso crearCurso(String nombreCurso, String descripcionCurso)
-        Curso editarCurso(String idCurso, String nombreCurso, String descripcionCurso)
-        void eliminarCurso(String idCurso)  
-        List<Curso> encontrarCursos()
-     */
+public class CursoService {   
+   
 
     @Autowired
     private CursoRepository cursoRepository;
@@ -26,7 +20,7 @@ public class CursoService {
         return cursoRepository.save(curso);
     }
 
-    public Curso findxIdCurso(int idCurso) {
+    public Optional<Curso> findxIdCurso(Integer idCurso) {
         return cursoRepository.findById(idCurso);
     }
 
@@ -36,22 +30,23 @@ public class CursoService {
 
     public Curso editCurso(Integer idCurso, Curso curso) {
         Optional<Curso> cursoExistente = cursoRepository.findById(idCurso);
-        if (cursoExistente != null) {
+        if (cursoExistente.isPresent()) {
             Curso cursoActualizado = cursoExistente.get();
             cursoActualizado.setNombre(curso.getNombre());
             cursoActualizado.setDescripcion(curso.getDescripcion());
+
             return cursoRepository.save(cursoActualizado);
         }
         return null;
     }
 
-    public Curso eliminarCurso(int idCurso) {
-        Curso curso = cursoRepository.findById(idCurso);
-        if (curso != null) {
+    public Optional<Curso> eliminarCurso(int idCurso) {
+        Optional<Curso> curso = cursoRepository.findById(idCurso); // cursoRepository.findById(idUsuario) ¿arroja error, porque? ---> error de sintaxis
+        if (curso != null) { // Aquí debería ser (curso.isPresent()) ???
             cursoRepository.deleteById(idCurso);
             return curso;
         }
-        return null;
+        return Optional.empty(); // Debes devolver Optional.empty() en lugar de null
     }
 
 }

@@ -26,7 +26,7 @@ public class CursoController {
 
     @PostMapping
     public ResponseEntity<Curso> postCurso(@RequestBody Curso curso) {
-        Curso buscado = cursoService.findxIdCurso(curso.getIdCurso());
+        Curso buscado = cursoService.findxIdCurso(curso.getIdCurso()).orElse(null);
         if (buscado == null) {
             return new ResponseEntity<>(cursoService.crearCurso(curso), HttpStatus.ACCEPTED);
         } else {
@@ -56,7 +56,7 @@ public class CursoController {
 
     @DeleteMapping("/{idCurso}")
     public ResponseEntity<Curso> deleteCurso(@PathVariable Integer idCurso) {
-        Curso eliminado = cursoService.eliminarCurso(idCurso);
+        Curso eliminado = cursoService.eliminarCurso(idCurso).orElse(null);
         if (eliminado != null) {
             return new ResponseEntity<>(eliminado, HttpStatus.OK);
         } else {
@@ -66,7 +66,7 @@ public class CursoController {
 
     @GetMapping("/{idCurso}")
     public ResponseEntity<Curso> getCursoById(@PathVariable Integer idCurso) {
-        Curso curso = cursoService.findxIdCurso(idCurso);
+        Curso curso = cursoService.findxIdCurso(idCurso).orElse(null);//.orElse controla el tipo Optional<Curso>
         if (curso != null) {
             return ResponseEntity.ok(curso);
         } else {

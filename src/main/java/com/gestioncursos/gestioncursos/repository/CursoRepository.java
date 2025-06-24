@@ -1,6 +1,6 @@
 package com.gestioncursos.gestioncursos.repository;
 
-import java.util.List;
+//import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,11 +18,11 @@ public interface CursoRepository extends JpaRepository<Curso, Integer> {
         List<Curso> encontrarCursos()
      */
 
-    
-    Curso save(Curso curso);
-    Curso findById(int idCurso);
+    //vienen integradas en Jpa
+    /*Curso save(Curso curso);
+    Curso findById(long idCurso); //no es long es int --> JpaRepository<Curso, Integer>
     List<Curso> findAll();
-    Curso deleteById(int idCurso);
+    Curso deleteById(int idCurso);*/
     
 
     
