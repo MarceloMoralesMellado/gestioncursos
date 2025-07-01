@@ -1,26 +1,38 @@
-### Microservicio Gestion de Cursos
+# Microservicio: Gestión de Cursos
 
-----GESTION CURSOS-----------------------
+## Endpoints Principales
 
-Curso:
-PUT: http://localhost:8083/api/curso/{idcurso}  --->(modifica solo nombre y descripción)
-DELETE: http://localhost:8083/api/curso/{idcurso}
-POST: http://localhost:8083/api/curso
+### Gestión de Cursos
 
+| Método | Endpoint                                 | Descripción                                 |
+|--------|------------------------------------------|---------------------------------------------|
+| POST   | `/api/curso`                             | Crear un nuevo curso                        |
+| PUT    | `/api/curso/{idcurso}`                   | Modificar nombre y descripción de un curso   |
+| DELETE | `/api/curso/{idcurso}`                   | Eliminar un curso                           |
+
+#### Ejemplo de Request (POST/PUT)
+```json
 {
-    "nombre": "Python",
-    "descripcion": "Python 1 Nivel Básico"
+  "nombre": "Python",
+  "descripcion": "Python 1 Nivel Básico"
 }
 
 {
-    "nombre": "Java",
-    "descripcion": "Java 2 Nivel Intermedio"
+  "nombre": "Java",
+  "descripcion": "Java 2 Nivel Intermedio"
 }
+```
 
+---
 
-----CREAR ROL:--------
-POST: http://localhost:8081/api/rol
+### Gestión de Roles
 
+| Método | Endpoint              | Descripción         |
+|--------|-----------------------|---------------------|
+| POST   | `/api/rol`            | Crear un nuevo rol  |
+
+#### Ejemplo de Request
+```json
 {
   "idRol": 1,
   "nombreRol": "Profesor",
@@ -32,12 +44,20 @@ POST: http://localhost:8081/api/rol
   "nombreRol": "Alumno",
   "funcion": "Participa en las clases y rinde evaluaciones"
 }
+```
 
-----GESTION USUARIO:--------
-PUT: http://localhost:8081/api/usuario/{idusuario}  --> (modificar nombre, apellido, email, rol)
-DELETE: http://localhost:8081/api/usuario/{idusuario}
-POST: http://localhost:8081/api/usuario
+---
 
+### Gestión de Usuarios
+
+| Método | Endpoint                                 | Descripción                                 |
+|--------|------------------------------------------|---------------------------------------------|
+| POST   | `/api/usuario`                           | Crear un nuevo usuario                      |
+| PUT    | `/api/usuario/{idusuario}`               | Modificar nombre, apellido, email y rol     |
+| DELETE | `/api/usuario/{idusuario}`               | Eliminar un usuario                         |
+
+#### Ejemplo de Request
+```json
 {
   "idUsuario": 1,
   "nombre": "Camila",
@@ -57,77 +77,52 @@ POST: http://localhost:8081/api/usuario
     "idRol": 2
   }
 }
--------------------------------------------------------------------------
+```
 
---GESTION SOPORTE-------------------------------------------------------
+---
 
+### Gestión de Soporte
 
+| Método | Endpoint                                                        | Descripción                                 |
+|--------|-----------------------------------------------------------------|---------------------------------------------|
+| POST   | `/api/soporte`                                                  | Crear ticket de soporte                     |
+| PUT    | `/api/soporte/{idSoporte}/usuarioAsignado/{usuarioId}`          | Asignar usuario a ticket                    |
+| PUT    | `/api/soporte/{idSoporte}`                                      | Modificar ticket                            |
+| GET    | `/api/soporte?estado=pendiente|abierto|cerrado`                 | Consultar tickets por estado                |
+| GET    | `/api/soporte`                                                  | Consultar todos los tickets                 |
+| DELETE | `/api/soporte/{idSoporte}`                                      | Eliminar ticket (cambiar estado, no borrar) |
 
-----CREAR TICKET DE SOPORTE----------------
-POST: localhost:8082/api/soporte
-
+#### Ejemplo de Request (POST/PUT)
+```json
 {
-   
-    "tituloSoporte": "Problema clase borrada",
-    "descripcionSoporte": "no puedo ver mis clases",
-    "estadoTicket": "Pendiente",
-    "categoriaTicket": "Prioridad_Media",
-    "usuario_asignado": null,
-    "creadoPor": "Soporte Tecnico"
-
+  "tituloSoporte": "Problema clase borrada",
+  "descripcionSoporte": "no puedo ver mis clases",
+  "estadoTicket": "Pendiente",
+  "categoriaTicket": "Prioridad_Media",
+  "usuario_asignado": null,
+  "creadoPor": "Soporte Tecnico"
 }
+```
 
+#### Nota del Profesor
+> No eliminar los tickets (DELETE), solo cambiar su estado para mantener el registro.
 
-----ASIGNAR USUARIO AL TICKET----(Prioridad_Baja, Prioridad_Media, Prioridad_Alta)(Abierto, Cerrado, Pendiente)--------------
-@PutMapping("/{idSoporte}/usuarioAsignado/{usuarioId}")
+---
 
-PUT: localhost:8082/api/soporte/1/usuarioAsignado/1
+## Pruebas Unitarias
 
-{
-   
-    "tituloSoporte": "Problema clase borrada",
-    "descripcionSoporte": "no puedo ver mis clases",
-    "estadoTicket": "Pendiente",
-    "categoriaTicket": "Prioridad_Media",
-    "usuario_asignado": null,
-    "creadoPor": "Soporte Tecnico"
+El microservicio cuenta con pruebas unitarias para los controladores y servicios principales. Puedes consultar el registro y resultados de las pruebas en la siguiente plantilla:
 
-}
+- [Plantilla Registro Pruebas Unitarias](https://docs.google.com/spreadsheets/d/1uK9pYxZMLNKzUvrn0RiBoK9UOOQIiOXfXNgxnNymPJs/edit?usp=sharing)
 
+Las pruebas cubren:
+- Creación, edición, consulta y eliminación de cursos
+- Endpoints REST de controladores
+- Lógica de negocio en servicios
 
------MODIFICAR TICKET----(Prioridad_Baja, Prioridad_Media, Prioridad_Alta)(Abierto, Cerrado, Pendiente)-------------------
+---
 
-PUT: localhost:8082/api/soporte/{idSoporte} 
-
-{
-   
-    "tituloSoporte": "Problemas acceso a clases",
-    "descripcionSoporte": "no puede acceder a las clases",
-    "estadoTicket": "Abierto",
-    "categoriaTicket": "Prioridad_Baja"    
-
-}
-
-
------CONSULTA TICKET POR ESTADO----(pendiente, abierto, cerrado)-------------
-GET: localhost:8082/api/soporte?estado=pendiente
-GET: localhost:8082/api/soporte?estado=abierto
-GET: localhost:8082/api/soporte?estado=cerrado
-
-
-
------CONSULTA TODOS LOS TICKET -------------
-
-GET: localhost:8082/api/soporte
-
-
-
------ELIMINAR TICKET
-
-DELETE: localhost:8082/api/soporte/{idSoporte}
-
-
-CORRECCION PROFESOR:
-
--Con el usuario que queda en el aire cuando uno elimina un ticket.
--No eliminar los ticket (DELETE), cambiarlos de estado solamente, así me puede quedar un registro por si se tiene que retomar nuevamente el problema.
+## Notas
+- El microservicio utiliza MySQL como base de datos.
+- Swagger UI disponible en `/doc/swagger-ui.html` para documentación interactiva.
+- El puerto por defecto es `8083`.
