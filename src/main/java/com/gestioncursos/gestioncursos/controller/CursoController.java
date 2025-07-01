@@ -18,7 +18,7 @@ import com.gestioncursos.gestioncursos.model.Curso;
 import com.gestioncursos.gestioncursos.service.CursoService;
 
 @RestController
-@RequestMapping("/api/curso")
+@RequestMapping("/api/cursos") // TENIA UN ERROR EN ("/api/curso") Y ERA ("/api/cursos"), EL CONTROLLER TEST NO TENIA BIEN LA RUTA
 public class CursoController {
     
     @Autowired
@@ -28,7 +28,7 @@ public class CursoController {
     public ResponseEntity<Curso> postCurso(@RequestBody Curso curso) {
         Curso buscado = cursoService.findxIdCurso(curso.getIdCurso()).orElse(null);
         if (buscado == null) {
-            return new ResponseEntity<>(cursoService.crearCurso(curso), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(cursoService.crearCurso(curso), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -40,7 +40,7 @@ public class CursoController {
         if (lista.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<>(lista, HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(lista, HttpStatus.OK);
         }
     }
 
@@ -54,7 +54,7 @@ public class CursoController {
         }
     }
 
-    @DeleteMapping("/{idCurso}")
+    /*@DeleteMapping("/{idCurso}")  //ARROJA ERROR EN EL TEST CONTROLLER 200 != 204
     public ResponseEntity<Curso> deleteCurso(@PathVariable Integer idCurso) {
         Curso eliminado = cursoService.eliminarCurso(idCurso).orElse(null);
         if (eliminado != null) {
@@ -62,7 +62,13 @@ public class CursoController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
+
+    @DeleteMapping("/{idCurso}")
+    public ResponseEntity<Void> deleteCurso(@PathVariable Integer idCurso) {
+    boolean eliminado = cursoService.eliminarCurso(idCurso).isPresent();
+    return eliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+}
 
     @GetMapping("/{idCurso}")
     public ResponseEntity<Curso> getCursoById(@PathVariable Integer idCurso) {

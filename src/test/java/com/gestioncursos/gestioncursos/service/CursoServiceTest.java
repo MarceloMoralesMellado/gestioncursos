@@ -15,18 +15,19 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class) // ?
+@ExtendWith(MockitoExtension.class) // se utiliza para habilitar la extensión de Mockito en pruebas unitarias
 class CursoServiceTest {
 
-    @Mock
+    @Mock // para crear objetos simulados (mocks) de clases o interfaces, en pruebas unitarias
     private CursoRepository cursoRepository;
 
-    @InjectMocks
+    @InjectMocks // para inyectar automáticamente los mocks en el objeto que estás probando.
     private CursoService cursoService;
 
-    @BeforeEach
+    @BeforeEach // marca un método que debe ejecutarse antes de cada uno de los métodos de prueba (@Test).
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
@@ -85,7 +86,7 @@ class CursoServiceTest {
 
     @Test
     void testEliminarCurso() {
-        Curso curso = new Curso(1, "PHP", "Nivel Básico");
+        Curso curso = new Curso(1, "Java", "Nivel Intermedio");
 
         when(cursoRepository.findById(1)).thenReturn(Optional.of(curso));
 
