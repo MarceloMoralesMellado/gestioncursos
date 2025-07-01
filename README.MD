@@ -124,5 +124,5 @@ Las pruebas cubren:
 
 ## Notas
 - El microservicio utiliza MySQL como base de datos.
-- Swagger UI disponible en `/doc/swagger-ui.html` para documentación interactiva.
+- Swagger UI disponible en `/doc/swagger-ui.html` y también en [http://localhost:8083/doc/swagger-ui/index.html#/](http://localhost:8083/doc/swagger-ui/index.html#/) para documentación interactiva (solo accesible con el microservicio levantado).
 - El puerto por defecto es `8083`.
