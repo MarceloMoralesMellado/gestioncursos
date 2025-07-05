@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // se utiliza para habilitar la extensión de Mockito en pruebas unitarias
@@ -40,7 +41,6 @@ class CursoServiceTest {
         when(cursoRepository.save(curso)).thenReturn(cursoGuardado);
 
         Curso resultado = cursoService.crearCurso(curso);
-
         assertThat(resultado.getIdCurso()).isEqualTo(1);
         verify(cursoRepository).save(curso);
     }
@@ -51,7 +51,6 @@ class CursoServiceTest {
         when(cursoRepository.findById(1)).thenReturn(Optional.of(curso));
 
         Optional<Curso> resultado = cursoService.findxIdCurso(1);
-
         assertThat(resultado).isPresent();
         assertThat(resultado.get().getNombre()).isEqualTo("Python");
         verify(cursoRepository).findById(1);
@@ -65,7 +64,6 @@ class CursoServiceTest {
         when(cursoRepository.findAll()).thenReturn(lista);
 
         List<Curso> resultado = cursoService.findAllCursos();
-
         assertThat(resultado).hasSize(1);
         verify(cursoRepository).findAll();
     }
@@ -79,9 +77,17 @@ class CursoServiceTest {
         when(cursoRepository.save(any(Curso.class))).thenReturn(cursoActualizado);
 
         Curso resultado = cursoService.editCurso(1, cursoActualizado);
-
         assertThat(resultado.getNombre()).isEqualTo("JavaScript");
         assertThat(resultado.getDescripcion()).isEqualTo("Nivel Básico");
+    }
+    
+    //EDITAR CURSO SI NO EXISTE
+    @Test 
+    void testEditCurso_noExiste() {
+        Curso actualizado = new Curso(1, "JavaScript", "Nivel Avanzado");
+        when(cursoRepository.findById(1)).thenReturn(Optional.empty());
+        Curso resultado = cursoService.editCurso(1, actualizado);
+        assertThat(resultado).isNull();
     }
 
     @Test
@@ -94,5 +100,14 @@ class CursoServiceTest {
 
         assertThat(eliminado).isPresent();
         verify(cursoRepository).deleteById(1);
+    }
+
+    //ELIMINAR CURSO SI NO EXISTE
+    @Test 
+    void testEliminarUsuario_noExiste() {
+        when(cursoRepository.findById(99)).thenReturn(Optional.empty());
+        Optional<Curso> eliminado = cursoService.eliminarCurso(99);
+        assertThat(eliminado).isEmpty();
+        verify(cursoRepository, never()).deleteById(anyInt());
     }
 }

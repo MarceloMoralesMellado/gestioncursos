@@ -42,7 +42,7 @@ public class CursoService {
 
     public Optional<Curso> eliminarCurso(int idCurso) {
         Optional<Curso> curso = cursoRepository.findById(idCurso); // cursoRepository.findById(idcurso) ¿arroja error, porque? ---> error de sintaxis
-        if (curso != null) { // Aquí debería ser (curso.isPresent()) ???
+        if (curso.isPresent()) { // Aquí debería ser (curso.isPresent()) ??? (curso != null)
             cursoRepository.deleteById(idCurso);
             return curso;
         }
