@@ -1,6 +1,7 @@
 package com.gestioncursos.gestioncursos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gestioncursos.gestioncursos.assamblers.CursoModelAssembler;
 import com.gestioncursos.gestioncursos.model.Curso;
 import com.gestioncursos.gestioncursos.service.CursoService;
 
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +28,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+//import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CursoController.class)
 public class CursoControllerTest {
@@ -36,8 +41,8 @@ public class CursoControllerTest {
     @MockBean
     private CursoService cursoService;
 
-    //@MockBean
-    //private CursoModelAssembler assembler;
+    @MockBean
+    private CursoModelAssembler assembler;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -46,21 +51,34 @@ public class CursoControllerTest {
     @BeforeEach
     void setUp() {
         curso = new Curso(1, "Java", "Nivel Intermedio");
-        // Aquí puedes inicializar otros objetos necesarios para las pruebas
-    }   
+
+        when(assembler.toModel(any(Curso.class))).thenAnswer(invocation -> {
+            Curso c = invocation.getArgument(0);
+            return EntityModel.of(c,
+                linkTo(CursoController.class).slash(c.getIdCurso()).withSelfRel(),
+                linkTo(CursoController.class).withRel("cursos"),
+                linkTo(CursoController.class).withRel("delete")
+            );
+        });
+    }
 
     @Test
     void testPostCurso_creaNuevo() throws Exception {
         Curso nuevo = new Curso(1, "JavaScript", "Nivel Avanzado");
+
         when(cursoService.findxIdCurso(1)).thenReturn(Optional.empty());
-        when(cursoService.crearCurso(any(Curso.class))).thenReturn(curso);
-        //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
+        when(cursoService.crearCurso(any(Curso.class))).thenReturn(nuevo);
+
 
         mockMvc.perform(post("/api/cursos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(nuevo)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.idCurso").value(1));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.idCurso").value(1))
+            .andExpect(jsonPath("$.nombre").value("JavaScript"))
+            .andExpect(jsonPath("$.descripcion").value("Nivel Avanzado"))
+            .andExpect(jsonPath("$._links.self.href").exists())
+            .andExpect(jsonPath("$._links.cursos.href").exists());
     }
 
     @Test
@@ -76,12 +94,15 @@ public class CursoControllerTest {
     @Test
     void testGetAllCursos_conDatos() throws Exception {
         when(cursoService.findAllCursos()).thenReturn(List.of(curso));
-        //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
 
         mockMvc.perform(get("/api/cursos"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].idCurso").value(1));
-
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.cursoList[0].idCurso").value(1))
+            .andExpect(jsonPath("$._embedded.cursoList[0].nombre").value("Java"))
+            .andExpect(jsonPath("$._embedded.cursoList[0].descripcion").value("Nivel Intermedio"))
+            .andExpect(jsonPath("$._embedded.cursoList[0]._links.self.href").exists())
+            .andExpect(jsonPath("$._embedded.cursoList[0]._links.cursos.href").exists())
+            .andExpect(jsonPath("$._links.self.href").exists()); 
     }
 
     @Test
@@ -92,14 +113,16 @@ public class CursoControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
+    @Test          
     void testGetCursoById_encontrado() throws Exception {
         when(cursoService.findxIdCurso(1)).thenReturn(Optional.of(curso));
         //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
 
         mockMvc.perform(get("/api/cursos/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombre").value("Java"));  
+                .andExpect(jsonPath("$.nombre").value("Java"))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.cursos.href").exists());
     }
 
     @Test
@@ -114,13 +137,16 @@ public class CursoControllerTest {
     void testPutCurso_actualizaDescripcion() throws Exception {
         Curso actualizado = new Curso(1, "Java", "Nivel Básico");
         when(cursoService.editCurso(eq(1), any(Curso.class))).thenReturn(actualizado);
-        //when(assembler.toModel(any(Curso.class))).thenReturn(EntityModel.of(actualizado));
 
         mockMvc.perform(put("/api/cursos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(actualizado)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombre").value("Java")); 
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.idCurso").value(1))
+            .andExpect(jsonPath("$.nombre").value("Java"))
+            .andExpect(jsonPath("$.descripcion").value("Nivel Básico"))
+            .andExpect(jsonPath("$._links.self.href").exists())
+            .andExpect(jsonPath("$._links.cursos.href").exists());
     }
     
     @Test
@@ -134,7 +160,7 @@ public class CursoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
+    @Test          
     void testDeleteCurso_encontrado() throws Exception {
         when(cursoService.eliminarCurso(1)).thenReturn(Optional.of(curso));
         //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
