@@ -30,7 +30,7 @@ public class CursoController {
         if (buscado == null) {
             return new ResponseEntity<>(cursoService.crearCurso(curso), HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.CONFLICT); // 409 CONFLICT
         }
     }
 

@@ -36,7 +36,7 @@ public class CursoControllerTest {
     @MockBean
     private CursoService cursoService;
 
-    @MockBean
+    //@MockBean
     //private CursoModelAssembler assembler;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -52,7 +52,7 @@ public class CursoControllerTest {
     @Test
     void testPostCurso_creaNuevo() throws Exception {
         Curso nuevo = new Curso(1, "JavaScript", "Nivel Avanzado");
-        when(cursoService.findxIdCurso(null)).thenReturn(Optional.empty());
+        when(cursoService.findxIdCurso(1)).thenReturn(Optional.empty());
         when(cursoService.crearCurso(any(Curso.class))).thenReturn(curso);
         //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
 
@@ -80,7 +80,8 @@ public class CursoControllerTest {
 
         mockMvc.perform(get("/api/cursos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.cursoList[0].idCursos").value(1));
+                .andExpect(jsonPath("$[0].idCurso").value(1));
+
     }
 
     @Test
@@ -98,28 +99,28 @@ public class CursoControllerTest {
 
         mockMvc.perform(get("/api/cursos/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("ana@mail.com"));  //OJO AQUI CON EL CORREO, HAY QUE CAMBIARLO !!!!!!!!!!!!!!!!
+                .andExpect(jsonPath("$.nombre").value("Java"));  
     }
 
     @Test
     void testGetCursoById_noEncontrado() throws Exception {
         when(cursoService.findxIdCurso(99)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/curso/99"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/cursos/99"))
+                .andExpect(status().isNotFound());
     }    
 
     @Test
     void testPutCurso_actualizaDescripcion() throws Exception {
-        Curso actualizado = new Curso(1, "Python", "Nivel Básico");
+        Curso actualizado = new Curso(1, "Java", "Nivel Básico");
         when(cursoService.editCurso(eq(1), any(Curso.class))).thenReturn(actualizado);
         //when(assembler.toModel(any(Curso.class))).thenReturn(EntityModel.of(actualizado));
 
-        mockMvc.perform(put("/api/curso/1")
+        mockMvc.perform(put("/api/cursos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(actualizado)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("elena@mail.com")); //OJO AQUI CON EL CORREO, HAY QUE CAMBIARLO !!!!!!!!!!!!!!!!
+                .andExpect(jsonPath("$.nombre").value("Java")); 
     }
     
     @Test
@@ -127,7 +128,7 @@ public class CursoControllerTest {
         Curso actualizado = new Curso(1, "Java", "Nivel Intermedio");
         when(cursoService.editCurso(eq(1), any(Curso.class))).thenReturn(null);
 
-        mockMvc.perform(put("/api/curso/1")
+        mockMvc.perform(put("/api/cursos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(actualizado)))
                 .andExpect(status().isNotFound());
@@ -138,16 +139,16 @@ public class CursoControllerTest {
         when(cursoService.eliminarCurso(1)).thenReturn(Optional.of(curso));
         //when(assembler.toModel(any(Curso.class))).thenReturn(cursoModel);
 
-        mockMvc.perform(delete("/api/curso/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idCurso").value(1));
+        mockMvc.perform(delete("/api/cursos/1"))
+            .andExpect(status().isNoContent());
+                
     }
 
     @Test
     void testDeleteCurso_noEncontrado() throws Exception {
         when(cursoService.eliminarCurso(1)).thenReturn(Optional.empty());
 
-        mockMvc.perform(delete("/api/curso/1"))
+        mockMvc.perform(delete("/api/cursos/1"))
                 .andExpect(status().isNotFound());
     }
 }
